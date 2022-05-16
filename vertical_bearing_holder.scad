@@ -47,7 +47,7 @@ connector_offset_degree = 8;
 // Tab in the filament guide to fit in the other half's side
 tab_width = 1;
 
-// Filament guide width
+// Filament guide parameters
 filament_guide_width = 5;
 filament_guide_height = 11;
 filament_guide_thickness = 6;
