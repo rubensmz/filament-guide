@@ -12,22 +12,28 @@ wall_thickness = 5;
 arc_tangent_degree = 60;
 
 bearing_out_offset = 4;
+base_out_dia = bearing_out_dia - bearing_out_offset;
 
 clearance = 0.1;
 clearance_bearing = 0.8;
 
-outer_dia = 1.5 * (bearing_out_dia - bearing_out_offset);
-inner_dia = 0.546 * (bearing_out_dia - bearing_out_offset);
+outer_dia = 1.545 * base_out_dia;
+inner_dia = 0.546 * base_out_dia;
 
 mid_dia = (outer_dia + inner_dia)/2;
 
 inner_hold_length = 2;
 
-show_bearing = 1;
+// Do not print with the bearing rendered!
+show_bearing = 0;
 show_base = 1;
 
-connector_dia = 2;
+connector_dia = 3;
 connector_offset_degree = 8;
+
+// Filament guide width
+filament_guide_width = 5;
+filament_guide_height = 12;
 
 half_number = 0;
 
@@ -46,13 +52,13 @@ module half(half_number) {
         if (show_base) {
             rotate([0, 0, 90 - arc_tangent_degree]) {
                 union() {
-                    translate([-(outer_dia - (bearing_out_dia - bearing_out_offset)/2), 0, 0]){
+                    translate([-(outer_dia - base_out_dia/2), 0, 0]){
                         linear_extrude(wall_thickness){
-                            arc(outer_dia - 1, inner_dia, 0, arc_tangent_degree);
+                            arc(outer_dia, inner_dia, 0, arc_tangent_degree);
                         }
                     }
 
-                    cylinder(h = wall_thickness, r = (bearing_out_dia- bearing_out_offset)/2 - 1, $fn = 100);
+                    cylinder(h = wall_thickness, r = (base_out_dia)/2, $fn = 100);
                 }
             }
         }
@@ -79,13 +85,14 @@ module half(half_number) {
                 }
             }
         }
-        
+
+        // Base
         union() {
             difference() {
                 rotate([0, 0, 90- arc_tangent_degree]) {
-                    translate([-(outer_dia - (bearing_out_dia - bearing_out_offset)/2), 0, -(bearing_thickness/2)]){
+                    translate([-(outer_dia - (base_out_dia)/2), 0, -(bearing_thickness/2)]){
                         linear_extrude(bearing_thickness/2){
-                            arc(outer_dia-1, inner_dia, 0, arc_tangent_degree);
+                            arc(outer_dia, inner_dia, 0, arc_tangent_degree);
                         }
 
                     }
@@ -115,9 +122,28 @@ module half(half_number) {
         }
 
         // Filament guide
-        /*translate([bearing_out_dia ]) {
-            cube([1, 2, 1]);
-        }*/
+        translate([base_out_dia/2, -filament_guide_width/2, 0]) {
+            chamferCube([filament_guide_height, filament_guide_width, wall_thickness], chamfers=[[0,0,0,0],[0,0,1,0],[0,1,1,0] ]);
+        }
+        translate([base_out_dia/2 - filament_guide_height/10, -filament_guide_width/2, 0]) {
+            cube([filament_guide_height/2, filament_guide_width, wall_thickness]);
+        }
+        translate([base_out_dia/2 + filament_guide_height-wall_thickness, -filament_guide_width/2, -wall_thickness]) {
+            chamferCube([wall_thickness, filament_guide_width, wall_thickness], chamfers=[[1,1,0,0],[1,0,0,1],[1,1,1,1] ]);
+        }
+
+        // Half connector for horizontal bearing holder
+        translate([-mid_dia * sin(arc_tangent_degree) -(bearing_thickness), mid_dia * cos(arc_tangent_degree), -bearing_thickness/2]){ 
+            // Rotate cylinder to face horizontal bearing holder
+            rotate([0, 90, 0]){
+                difference() {
+                    chamferCylinder(h=bearing_thickness, r=bearing_in_dia/2, ch=1, ch2=0);
+                    translate([0,-bearing_in_dia/2,0]) {
+                        cube([bearing_in_dia, bearing_in_dia, bearing_in_dia], center=false);
+                    }
+                }
+            }
+        }
 
     }
 }
@@ -154,8 +180,11 @@ module bearing(out_dia, in_dia, thickness) {
 }
 
 module connector(r) {
-    translate([0, r, 0]) {
-        translate([-(outer_dia + inner_dia)/2 * sin(arc_tangent_degree), -(outer_dia + inner_dia)/2 * cos(arc_tangent_degree), -bearing_thickness/2]) {
+    // Move connector in the y axe to position it on the new r radius circumference
+    translate([0, r, -bearing_thickness/2]) {
+        // Move connector to the bottom center of the arc
+        translate([-mid_dia * sin(arc_tangent_degree), -mid_dia * cos(arc_tangent_degree), 0]) {
+            // Move connector upwards, to avoid in the edge of the base
             rotate([0, 0, arc_tangent_degree-connector_offset_degree]) {
                 translate([mid_dia * sin(arc_tangent_degree), mid_dia * cos(arc_tangent_degree), 0]) {
                     chamferCylinder(
