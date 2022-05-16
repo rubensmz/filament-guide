@@ -35,7 +35,7 @@ connector_offset_degree = 8;
 filament_guide_width = 5;
 filament_guide_height = 12;
 
-half_number = 0;
+half_number = 1;
 
 if (half_number == 0) {
     half(half_number);
@@ -128,8 +128,8 @@ module half(half_number) {
         translate([base_out_dia/2 - filament_guide_height/10, -filament_guide_width/2, 0]) {
             cube([filament_guide_height/2, filament_guide_width, wall_thickness]);
         }
-        translate([base_out_dia/2 + filament_guide_height-wall_thickness, -filament_guide_width/2, -wall_thickness]) {
-            chamferCube([wall_thickness, filament_guide_width, wall_thickness], chamfers=[[1,1,0,0],[1,0,0,1],[1,1,1,1] ]);
+        translate([half_number == 0 ? base_out_dia/2 + filament_guide_height-wall_thickness : base_out_dia/2 + filament_guide_height-wall_thickness/2, -filament_guide_width/2, -bearing_thickness]) {
+            chamferCube([wall_thickness/2, filament_guide_width, bearing_thickness], chamfers=half_number == 0 ? [[0,0,0,0],[0,0,0,0],[1,0,0,1] ] : [[0,0,0,0],[0,0,0,0],[0,1,1,0] ]);
         }
 
         // Half connector for horizontal bearing holder
