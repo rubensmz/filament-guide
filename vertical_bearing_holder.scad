@@ -16,6 +16,7 @@ base_out_dia = bearing_out_dia - bearing_out_offset;
 
 clearance = 0.1;
 clearance_bearing = 0.8;
+clearance_bottom_bearing = 0.2;
 
 outer_dia = 1.545 * base_out_dia;
 inner_dia = 0.546 * base_out_dia;
@@ -31,9 +32,12 @@ show_base = 1;
 connector_dia = 3;
 connector_offset_degree = 8;
 
+tab_width = 1;
+
 // Filament guide width
 filament_guide_width = 5;
-filament_guide_height = 12;
+filament_guide_height = 11;
+filament_guide_thickness = 6;
 
 half_number = 1;
 
@@ -128,8 +132,24 @@ module half(half_number) {
         translate([base_out_dia/2 - filament_guide_height/10, -filament_guide_width/2, 0]) {
             cube([filament_guide_height/2, filament_guide_width, wall_thickness]);
         }
-        translate([half_number == 0 ? base_out_dia/2 + filament_guide_height-wall_thickness : base_out_dia/2 + filament_guide_height-wall_thickness/2, -filament_guide_width/2, -bearing_thickness]) {
-            chamferCube([wall_thickness/2, filament_guide_width, bearing_thickness], chamfers=half_number == 0 ? [[0,0,0,0],[0,0,0,0],[1,0,0,1] ] : [[0,0,0,0],[0,0,0,0],[0,1,1,0] ]);
+        
+        // Horizontal stick
+        translate([half_number == 0 ? base_out_dia/2 + filament_guide_height-filament_guide_thickness : base_out_dia/2 + filament_guide_height-filament_guide_thickness/2, -filament_guide_width/2, -bearing_thickness]) {
+            difference() {
+                union() {
+                    chamferCube([filament_guide_thickness/2, filament_guide_width, bearing_thickness], chamfers=half_number == 0 ? [[0,0,0,0],[0,0,0,0],[1,0,0,1] ] : [[0,0,0,0],[0,0,0,0],[0,1,1,0] ]);
+                    
+                    translate([half_number == 0 ? filament_guide_thickness/2 : -tab_width/2, 0, 0]) {
+                        cube([tab_width/2, filament_guide_width,tab_width/2]);
+                    }
+
+                }
+
+                translate([half_number == 0 ? filament_guide_thickness/2-tab_width : 0, 0, bearing_thickness-tab_width]) {
+                    cube([tab_width, filament_guide_width, tab_width]);
+                }
+            }
+            
         }
 
         // Half connector for horizontal bearing holder
@@ -137,7 +157,7 @@ module half(half_number) {
             // Rotate cylinder to face horizontal bearing holder
             rotate([0, 90, 0]){
                 difference() {
-                    chamferCylinder(h=bearing_thickness, r=bearing_in_dia/2, ch=1, ch2=0);
+                    chamferCylinder(h=bearing_thickness, r=bearing_in_dia/2 - clearance_bottom_bearing, ch=1, ch2=0);
                     translate([0,-bearing_in_dia/2,0]) {
                         cube([bearing_in_dia, bearing_in_dia, bearing_in_dia], center=false);
                     }
