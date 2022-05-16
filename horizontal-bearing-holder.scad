@@ -15,6 +15,7 @@ bearing_thickness = 8;
 bearing_wall_thickness = 4;
 // External diameter of the bearing holder
 bearing_holder_dia = bearing_out_dia + bearing_wall_thickness;
+clearance = 0.1;
 
 
 // Check dimesions
@@ -22,13 +23,13 @@ assert (bearing_holder_dia > bearing_out_dia, "Bearing holder diameter is smalle
 
 union() {
     translate([0, 0, -height_insert]) {
-        cylinder(h = height_insert, r=8, $fn=6);
+        cylinder(h = height_insert, r=8-clearance, $fn=6);
     }
     
     translate([0, 0, 0]){
         difference() {
             linear_extrude(bearing_thickness + bearing_wall_thickness) {
-                circle(d=bearing_holder_dia, $fn=360);
+                circle(d=bearing_holder_dia + clearance, $fn=360);
             }
             translate([0, 0, bearing_wall_thickness]) {
                 linear_extrude(bearing_thickness + 1) {
