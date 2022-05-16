@@ -3,7 +3,7 @@ include <Chamfers-for-OpenSCAD/Chamfer.scad>;
 // Internal bearing diameter
 bearing_in_dia = 10;
 // External bearing diameter
-bearing_out_dia = 26 ;
+bearing_out_dia = 26;
 // Bearing thickness
 bearing_thickness = 8;
 
@@ -11,20 +11,23 @@ wall_thickness = 5;
 
 arc_tangent_degree = 60;
 
-clearance = 0.1;
+bearing_out_offset = 4;
 
-outer_dia = 1.5 * bearing_out_dia;
-inner_dia = 0.546 * bearing_out_dia;
+clearance = 0.1;
+clearance_bearing = 0.8;
+
+outer_dia = 1.5 * (bearing_out_dia - bearing_out_offset);
+inner_dia = 0.546 * (bearing_out_dia - bearing_out_offset);
 
 mid_dia = (outer_dia + inner_dia)/2;
 
 inner_hold_length = 2;
 
-show_bearing = 0;
+show_bearing = 1;
 show_base = 1;
 
-connector_dia = 3;
-connector_offset_degree = 15;
+connector_dia = 2;
+connector_offset_degree = 8;
 
 half_number = 0;
 
@@ -39,18 +42,17 @@ else {
 
 module half(half_number) {
     union () {
-        
         // Bearing holder base
         if (show_base) {
             rotate([0, 0, 90 - arc_tangent_degree]) {
                 union() {
-                    translate([-(outer_dia - bearing_out_dia/2), 0, 0]){
+                    translate([-(outer_dia - (bearing_out_dia - bearing_out_offset)/2), 0, 0]){
                         linear_extrude(wall_thickness){
                             arc(outer_dia - 1, inner_dia, 0, arc_tangent_degree);
                         }
                     }
 
-                    cylinder(h = wall_thickness, r = bearing_out_dia/2 - 1, $fn = 100);
+                    cylinder(h = wall_thickness, r = (bearing_out_dia- bearing_out_offset)/2 - 1, $fn = 100);
                 }
             }
         }
@@ -71,15 +73,17 @@ module half(half_number) {
 
         // Bearing. For reference
         if (show_bearing) {
-            scale([0, 0, -1]) { 
+            translate([0, 0, -bearing_thickness]) { 
+                color([0.6, 0.6, 0.6]) {
                 bearing(bearing_out_dia, bearing_in_dia, bearing_thickness);
+                }
             }
         }
         
         union() {
             difference() {
                 rotate([0, 0, 90- arc_tangent_degree]) {
-                    translate([-(outer_dia - bearing_out_dia/2), 0, -(bearing_thickness/2)]){
+                    translate([-(outer_dia - (bearing_out_dia - bearing_out_offset)/2), 0, -(bearing_thickness/2)]){
                         linear_extrude(bearing_thickness/2){
                             arc(outer_dia-1, inner_dia, 0, arc_tangent_degree);
                         }
@@ -88,7 +92,7 @@ module half(half_number) {
                 }
                 translate([0, 0, -(bearing_thickness/2 + 0.5)]){
                     union() {
-                        cylinder(h = bearing_thickness/2 +1, d = bearing_out_dia + clearance, $fn = 100);
+                        cylinder(h = bearing_thickness/2 +1, d = bearing_out_dia + clearance_bearing, $fn = 100);
                         translate([-bearing_out_dia/4, 0, 0]) {
                             cube(bearing_out_dia);
                         }
