@@ -145,15 +145,15 @@ module half(half_number) {
                 }
 
                 if (half_number == 0) {
-                    connector(mid_dia/4);
-                    connector(-mid_dia/4);
+                    connector(mid_dia/4, half_number);
+                    connector(-mid_dia/4, half_number);
                 }
                    
             }
             if (half_number == 1) {
                 translate([0, 0, -bearing_thickness/2 + 2*clearance]) {
-                    connector(mid_dia/4);
-                    connector(-mid_dia/4);
+                    connector(mid_dia/4, half_number);
+                    connector(-mid_dia/4, half_number);
                 }
                 
             }
@@ -233,7 +233,7 @@ module bearing(out_dia, in_dia, thickness) {
     }
 }
 
-module connector(r) {
+module connector(r, half_number) {
     // Move connector in the y axe to position it on the new r radius circumference
     translate([0, r, -bearing_thickness/2]) {
         // Move connector to the bottom center of the arc
