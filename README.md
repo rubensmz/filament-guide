@@ -7,7 +7,7 @@ This is a parametric model for OpenSCAD of a filament guide to be placed in the 
 ### Vertical bearing holder
 
 The parameters for the vertical bearing holder are:
-```
+```OpenSCAD
 // Internal bearing diameter
 bearing_in_dia = 10;
 // External bearing diameter
@@ -63,7 +63,7 @@ filament_guide_thickness = 6;
 
 ### Horizontal bearing holder
 The parameters for the horizontal bearing holder are:
-```
+```OpenSCAD
 // Height of Z axis top part where bearing holder will be inserted
 height_z_axis_top = 5;
 // Extra height for the bearing holder. It will exceed the bottom of the Z axis top part
