@@ -1,4 +1,4 @@
-# Filament guide for Prusa i3 MK3
+# Filament guide for PrusaMK3
 
 This is a parametric model for OpenSCAD of a filament guide to be placed in the hex slot of the the top Z axis printed part. Is is a remix of the original [filament guide designed by Habony Norbert](https://www.printables.com/model/135950-filament-guide/files), which was designed only for 608 bearings.
 
